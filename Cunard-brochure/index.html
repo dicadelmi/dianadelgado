@@ -291,23 +291,25 @@
   }, { threshold: 0.5 });
   statNums.forEach(el => io.observe(el));
 
-  // category hover filters the work grid
+  // category hover filters the work grid (only present on the index page)
   const catRow = document.getElementById('catRow');
   const workGrid = document.getElementById('workGrid');
-  const gridCells = workGrid.querySelectorAll('a');
-  catRow.querySelectorAll('span').forEach(tag => {
-    tag.addEventListener('mouseenter', () => {
-      const cat = tag.dataset.cat;
-      workGrid.classList.add('filtering');
-      gridCells.forEach(cell => cell.classList.toggle('match', cell.dataset.cat === cat));
-      tag.classList.add('active');
+  if (catRow && workGrid) {
+    const gridCells = workGrid.querySelectorAll('a');
+    catRow.querySelectorAll('span').forEach(tag => {
+      tag.addEventListener('mouseenter', () => {
+        const cat = tag.dataset.cat;
+        workGrid.classList.add('filtering');
+        gridCells.forEach(cell => cell.classList.toggle('match', cell.dataset.cat === cat));
+        tag.classList.add('active');
+      });
+      tag.addEventListener('mouseleave', () => {
+        workGrid.classList.remove('filtering');
+        gridCells.forEach(cell => cell.classList.remove('match'));
+        tag.classList.remove('active');
+      });
     });
-    tag.addEventListener('mouseleave', () => {
-      workGrid.classList.remove('filtering');
-      gridCells.forEach(cell => cell.classList.remove('match'));
-      tag.classList.remove('active');
-    });
-  });
+  }
 
   // mobile burger menu (toggles the social icons)
   const iconsBurger = document.getElementById('iconsBurger');
