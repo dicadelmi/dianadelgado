@@ -305,10 +305,33 @@
     });
   });
 
+  // on touch devices, tap a category to select it (turns black) and
+  // filter the grid to that category; tapping a different category
+  // updates the selection and the visible cards each time
+  const isTouchDevice = window.matchMedia('(hover: none)').matches || 'ontouchstart' in window;
+  if (isTouchDevice) {
+    catRow.querySelectorAll('span').forEach(tag => {
+      tag.addEventListener('click', () => {
+        const cat = tag.dataset.cat;
+        const alreadyActive = tag.classList.contains('active');
+
+        catRow.querySelectorAll('span').forEach(t => t.classList.remove('active'));
+
+        if (alreadyActive) {
+          workGrid.classList.remove('filtering');
+          gridCells.forEach(cell => cell.classList.remove('match'));
+        } else {
+          tag.classList.add('active');
+          workGrid.classList.add('filtering');
+          gridCells.forEach(cell => cell.classList.toggle('match', cell.dataset.cat === cat));
+        }
+      });
+    });
+  }
+
   // on touch devices, tapping a work-grid item should first reveal the
   // dark overlay + title (the :hover effect) and only navigate to the
   // subpage once that reveal has finished
-  const isTouchDevice = window.matchMedia('(hover: none)').matches || 'ontouchstart' in window;
   if (isTouchDevice) {
     gridCells.forEach(cell => {
       cell.addEventListener('click', function (e) {
