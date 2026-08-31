@@ -81,6 +81,7 @@
   .statement p{
     max-width:900px;margin:0 auto;
     font-size:26px;font-weight:600;letter-spacing:-0.01em;line-height:1.5;
+    font-optical-sizing:none;
     visibility:hidden;
   }
   .statement p.sized{visibility:visible;}
@@ -290,9 +291,12 @@
     const p = document.getElementById('statementText');
     if(!p) return;
     const lines = p.querySelectorAll('.stmt-line');
-    const REF = 200; // px reference size for measuring
+    const REF = 60; // px reference size for measuring — kept moderate since the
+                    // display font is a variable font; font-optical-sizing:none
+                    // above keeps glyph proportions fixed across sizes, but a
+                    // more moderate reference avoids any residual mismatch.
     const MIN_SIZE = 11;
-    const MAX_SIZE = 32;
+    const MAX_SIZE = 28;
 
     function size(){
       const prevSize = p.style.fontSize;
@@ -300,7 +304,8 @@
       let maxWidth = 0;
       lines.forEach(l => { maxWidth = Math.max(maxWidth, l.getBoundingClientRect().width); });
       const containerWidth = p.clientWidth;
-      const usable = containerWidth * 0.98; // tiny breathing room, no hard clip
+      const usable = containerWidth * 0.90; // extra safety margin so the text
+                                             // never crowds the container edges
       if(maxWidth > 0 && containerWidth > 0){
         let target = (usable / maxWidth) * REF;
         target = Math.max(MIN_SIZE, Math.min(target, MAX_SIZE));
@@ -325,6 +330,9 @@
     } else {
       document.addEventListener('DOMContentLoaded', size);
     }
+    // extra safety-net pass — catches any late webfont swap on devices where
+    // fonts.ready resolves before the variable font's glyphs are fully settled
+    setTimeout(size, 500);
     window.addEventListener('load', size);
   })();
 
