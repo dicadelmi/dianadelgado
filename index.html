@@ -538,20 +538,32 @@
     // Only decode/play videos that are actually visible in the gallery strip.
     // With 6 video instances total (3 unique cards, each duplicated for the
     // seamless scroll loop) decoding all of them at once is what was making
-    // the whole gallery feel janky — pausing off-screen copies cuts that
-    // load dramatically and lets the visible ones play smoothly.
+    // the whole gallery feel janky — pausing far off-screen copies cuts that
+    // load. Pausing is debounced (and the margin is generous) because an
+    // immediate pause/resume right as a card flickers across the visibility
+    // threshold is what was causing the brief black-flash bug: some browsers
+    // drop the decoded frame when a video is paused and resumed in quick
+    // succession. Resuming is still immediate, so there's no lag scrolling
+    // a card back into view.
     if('IntersectionObserver' in window){
+      const pauseTimers = new WeakMap();
       const io = new IntersectionObserver(list => {
         list.forEach(en => {
           const v = en.target.querySelector('video');
           if(!v) return;
+          const pending = pauseTimers.get(v);
           if(en.isIntersecting){
+            if(pending){ clearTimeout(pending); pauseTimers.delete(v); }
             tryPlay(v);
-          } else {
-            v.pause();
+          } else if(!pending){
+            const t = setTimeout(() => {
+              v.pause();
+              pauseTimers.delete(v);
+            }, 600);
+            pauseTimers.set(v, t);
           }
         });
-      }, {root:null, rootMargin:'200px', threshold:0.01});
+      }, {root:null, rootMargin:'600px', threshold:0.01});
       cells.forEach(cell => io.observe(cell));
     }
 
