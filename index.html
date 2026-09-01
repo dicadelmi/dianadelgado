@@ -83,6 +83,11 @@
   .h4c{background:linear-gradient(160deg,#1c1c1c,#5a5a5a);}
   .h5c{background:radial-gradient(circle at 60% 30%,#7a1f1f,#2a0d0d 70%);}
   .h6c{background:linear-gradient(160deg,#dfeef2,#a9c9d6 60%,#3f6577);}
+  /* Garden Lounge: its logo sits at the vertical center of the source clip,
+     so keep the crop centered instead of the default top-weighted crop */
+  .h6c video{object-position:center center;}
+  /* Contract Sentinel: slightly richer, more saturated colour */
+  .h5c video{filter:saturate(1.22) contrast(1.05) brightness(1.02);}
   .swatch-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(5,1fr);gap:3px;padding:14%;height:100%;}
   .swatch-grid div{border-radius:1px;}
 
