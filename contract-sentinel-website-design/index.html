@@ -82,11 +82,9 @@
   main{margin-top:40px;}
 
   /* PROJECT NAV */
-  .project-nav{border-top:1px solid var(--line);padding:32px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;}
+  .project-nav{border-top:1px solid var(--line);padding:32px 0;display:flex;justify-content:flex-end;align-items:center;}
   .project-nav a{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:300;letter-spacing:.06em;text-transform:uppercase;color:var(--grey);transition:color .2s ease;}
   .project-nav a:hover{color:var(--black);}
-  .project-nav .next{text-align:right;justify-content:flex-end;}
-  .project-nav .home{text-align:center;justify-content:center;}
 
   footer{background:var(--black);padding:34px 0;font-size:12px;color:#8a8a8a;text-align:center;}
   .social-row{display:flex;justify-content:center;align-items:flex-end;gap:26px;margin-bottom:34px;}
@@ -108,8 +106,6 @@
     }
     .project-title{white-space:nowrap;font-size:clamp(16px,calc((100vw - 40px) / 16.5),40px);}
     .project-nav{flex-direction:column;align-items:flex-start;gap:14px;}
-    .project-nav .next{text-align:left;}
-    .project-nav .home{text-align:left;}
   }
 </style>
 </head>
@@ -151,9 +147,7 @@
 
 <div class="wrap">
   <div class="project-nav">
-    <a href="../nebia-website-design/"><svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1L1.5 5.5L6 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Nebia Website Design</a>
-    <a href="https://dianadelgado.uk" class="home">Works</a>
-    <a href="../queen-anne-menus/" class="next">Queen Anne Menus <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5.5 5.5L1 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <a href="https://dianadelgado.uk">Works <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5.5 5.5L1 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   </div>
 </div>
 
