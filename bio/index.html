@@ -155,7 +155,7 @@
 
   /* ===== ANIMATED ICON ROW (real assets) ===== */
   .icon-row{
-    display:flex;flex-wrap:wrap;gap:40px;margin-top:48px;padding-top:8px;
+    display:flex;flex-wrap:wrap;gap:26px;margin-top:48px;padding-top:8px;
   }
   .icon-item{
     display:flex;flex-direction:column;align-items:center;gap:12px;
@@ -176,7 +176,7 @@
   .icon-item:nth-child(9){transition-delay:.48s;}
 
   .icon-glyph{
-    width:36px;height:36px;
+    width:30px;height:30px;
     display:flex;align-items:center;justify-content:center;
     transition:transform .35s ease;
   }
@@ -200,16 +200,18 @@
     .reveal{transition:none;opacity:1;transform:none;}
   }
 
-  /* CORE STRENGTHS */
+  /* CORE STRENGTHS - real bulleted list */
   .strengths{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px 40px;
+    list-style:none;
   }
   .strength-item{
     font-size:15px;line-height:1.6;color:#333;
     padding-left:16px;position:relative;
   }
   .strength-item::before{
-    content:'';position:absolute;left:1px;top:8px;width:1.5px;height:1.5px;border-radius:50%;background:var(--grey);
+    content:'•';position:absolute;left:0;top:0;
+    font-size:15px;line-height:1.6;color:var(--grey);
   }
 
   /* CONTACT CTA - matches the WORKS / BIO nav label styling */
@@ -250,11 +252,15 @@
     section.block{padding:44px 0;}
     .strengths{grid-template-columns:1fr;}
 
-    /* icons: 9 marks now, so let them wrap into neat rows instead of
-       forcing a single line */
-    .icon-row{gap:20px 16px;flex-wrap:wrap;justify-content:flex-start;margin-top:32px;}
-    .icon-glyph{width:26px;height:26px;}
-    .icon-label{font-size:10px;}
+    /* icons: fixed 5-column grid guarantees exactly 2 rows for 9 icons */
+    .icon-row{
+      display:grid;grid-template-columns:repeat(5,1fr);
+      row-gap:22px;column-gap:6px;
+      gap:22px 6px;
+      margin-top:32px;
+    }
+    .icon-glyph{width:24px;height:24px;}
+    .icon-label{font-size:9.5px;}
 
     /* education: abbreviate handles most of it (in the markup); this
        gives a little extra headroom on the smallest phones too */
@@ -309,7 +315,7 @@
           <div class="role-company">Cunard, Carnival UK (P&amp;O Cruises &amp; Cunard)</div>
           <ul>
             <li>Interpret stakeholder objectives into clear, accessible visual outputs.</li>
-            <li>Design guest-facing creative across CRM, Trade, Social, Web, Brand, F&amp;B and Campaigns.</li>
+            <li>Design multi-channel creative for guests and crew across CRM, digital, brand, F&amp;B and marketing campaigns.</li>
             <li>Apply Cunard brand guidelines accurately, upholding tone and identity.</li>
             <li>Adapt creative across digital and print for consistent, on-brand results.</li>
             <li>Evolve work through feedback, refining typography, illustration and motion design.</li>
@@ -353,7 +359,7 @@
           <div class="role-title">Service Team Member Star</div>
           <div class="role-company">Itsu</div>
           <ul>
-            <li>Represented the brand through direct customer interaction in a fast-paced team.</li>
+            <li>Represented the brand through direct <span class="mobile-break">customer interaction in a fast-paced team.</span></li>
             <li>Delivered consistently excellent service, <span class="mobile-break">earning multiple "Butterflies" bonuses.</span></li>
           </ul>
         </div>
@@ -451,7 +457,7 @@
 
   <section class="block reveal" id="skills">
     <h2>Technical Skills</h2>
-    <p class="skills-text">Technically, I am proficient in the full Adobe Creative Suite, Figma, Procreate, Canva and Microsoft Office, enabling me to produce interactive solutions across digital and print formats. I also explore AI-assisted ideation to support efficiency and innovation.</p>
+    <p class="skills-text">Technically, I am proficient in the full Adobe Creative Suite, Figma, Procreate, Canva and Microsoft Office, enabling me <span class="mobile-break">to produce interactive solutions across digital and print formats.</span> I also explore AI-assisted ideation to support efficiency and innovation.</p>
 
     <div class="icon-row">
       <div class="icon-item" aria-label="Illustrator">
@@ -513,14 +519,14 @@
 
   <section class="block reveal" id="strengths">
     <h2>Core Strengths</h2>
-    <div class="strengths">
-      <div class="strength-item">Brand consistency across <span class="mobile-break">multi-channel campaigns</span></div>
-      <div class="strength-item">Cross-functional collaboration with <span class="mobile-break">marketing teams</span></div>
-      <div class="strength-item">Strategic thinking rooted in <span class="mobile-break">marketing communications</span></div>
-      <div class="strength-item">Adaptability across print, digital and <span class="mobile-break">brand identity work</span></div>
-      <div class="strength-item">Attention to detail under fast-paced deadlines</div>
-      <div class="strength-item">Curiosity-driven, idea-first creative approach</div>
-    </div>
+    <ul class="strengths">
+      <li class="strength-item">Brand consistency across <span class="mobile-break">multi-channel campaigns</span></li>
+      <li class="strength-item">Cross-functional collaboration with <span class="mobile-break">marketing teams</span></li>
+      <li class="strength-item">Strategic thinking rooted in <span class="mobile-break">marketing communications</span></li>
+      <li class="strength-item">Adaptability across print, digital and <span class="mobile-break">brand identity work</span></li>
+      <li class="strength-item">Attention to detail under fast-paced deadlines</li>
+      <li class="strength-item">Curiosity-driven, idea-first creative approach</li>
+    </ul>
   </section>
 
   <section class="cta reveal">
