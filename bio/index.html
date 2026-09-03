@@ -166,10 +166,14 @@
     opacity:1;transform:translateY(0);
   }
   .icon-item:nth-child(1){transition-delay:0s;}
-  .icon-item:nth-child(2){transition-delay:.1s;}
-  .icon-item:nth-child(3){transition-delay:.2s;}
-  .icon-item:nth-child(4){transition-delay:.3s;}
-  .icon-item:nth-child(5){transition-delay:.4s;}
+  .icon-item:nth-child(2){transition-delay:.06s;}
+  .icon-item:nth-child(3){transition-delay:.12s;}
+  .icon-item:nth-child(4){transition-delay:.18s;}
+  .icon-item:nth-child(5){transition-delay:.24s;}
+  .icon-item:nth-child(6){transition-delay:.3s;}
+  .icon-item:nth-child(7){transition-delay:.36s;}
+  .icon-item:nth-child(8){transition-delay:.42s;}
+  .icon-item:nth-child(9){transition-delay:.48s;}
 
   .icon-glyph{
     width:36px;height:36px;
@@ -246,9 +250,10 @@
     section.block{padding:44px 0;}
     .strengths{grid-template-columns:1fr;}
 
-    /* icons: shrink so all five sit on one row on any phone width */
-    .icon-row{gap:10px;flex-wrap:nowrap;justify-content:space-between;margin-top:32px;}
-    .icon-glyph{width:24px;height:24px;}
+    /* icons: 9 marks now, so let them wrap into neat rows instead of
+       forcing a single line */
+    .icon-row{gap:20px 16px;flex-wrap:wrap;justify-content:flex-start;margin-top:32px;}
+    .icon-glyph{width:26px;height:26px;}
     .icon-label{font-size:10px;}
 
     /* education: abbreviate handles most of it (in the markup); this
@@ -256,6 +261,9 @@
     .edu-degree{font-size:15px;}
     .edu-item{gap:12px;}
     .edu-item + .edu-item{margin-top:22px;padding-top:22px;}
+
+    /* forced line breaks on mobile only, for specific phrases */
+    .mobile-break{display:block;}
   }
 </style>
 </head>
@@ -265,7 +273,7 @@
   <div class="header-wrap nav-row">
     <nav>
       <ul>
-      <li><a href="index.html">Works</a></li>
+      <li><a href="https://dianadelgado.uk">Works</a></li>
       <li><a href="index.html#about">Bio</a></li>
     </ul></nav>
     <div class="icons-wrap">
@@ -285,7 +293,7 @@
 
   <section class="page-head reveal">
     <h1>Bio</h1>
-    <p class="sub">A graphic designer with over a decade of experience shaping brand identities, brochures and digital campaigns across cruise, publishing, hospitality and advertising sectors.</p>
+    <p class="sub">A graphic designer with over a decade of experience shaping brand identities, brochures and digital campaigns across travel, publishing, hospitality and advertising sectors.</p>
   </section>
 
   <section class="block reveal" id="experience">
@@ -297,7 +305,7 @@
         <div class="role-dates">2023 - Present</div>
         <div class="role-dot-col"></div>
         <div class="role-content">
-          <div class="role-title">Marketing Designer</div>
+          <div class="role-title">Graphic Designer</div>
           <div class="role-company">Cunard, Carnival UK (P&amp;O Cruises &amp; Cunard)</div>
           <ul>
             <li>Interpret stakeholder objectives into clear, accessible visual outputs.</li>
@@ -346,7 +354,7 @@
           <div class="role-company">Itsu</div>
           <ul>
             <li>Represented the brand through direct customer interaction in a fast-paced team.</li>
-            <li>Delivered consistently excellent service, earning multiple "Butterflies" bonuses.</li>
+            <li>Delivered consistently excellent service, <span class="mobile-break">earning multiple "Butterflies" bonuses.</span></li>
           </ul>
         </div>
       </div>
@@ -383,7 +391,7 @@
           <div class="role-title">External &amp; Creative Media Designer</div>
           <div class="role-company">AIESEC International</div>
           <ul>
-            <li>Produced external creative and media materials alongside El Clavo.</li>
+            <li>Produced external creative and media <span class="mobile-break">materials alongside El Clavo.</span></li>
           </ul>
         </div>
       </div>
@@ -446,11 +454,35 @@
     <p class="skills-text">Technically, I am proficient in the full Adobe Creative Suite, Figma, Procreate, Canva and Microsoft Office, enabling me to produce interactive solutions across digital and print formats. I also explore AI-assisted ideation to support efficiency and innovation.</p>
 
     <div class="icon-row">
-      <div class="icon-item" aria-label="Adobe Creative Suite">
+      <div class="icon-item" aria-label="Illustrator">
         <div class="icon-glyph">
-          <div class="icon-mask" style="-webkit-mask-image:url('images/adobe-cc-mask.png');mask-image:url('images/adobe-cc-mask.png');"></div>
+          <div class="icon-mask" style="-webkit-mask-image:url('images/illustrator-mask.png');mask-image:url('images/illustrator-mask.png');"></div>
         </div>
-        <span class="icon-label">Adobe CC</span>
+        <span class="icon-label">Illustrator</span>
+      </div>
+      <div class="icon-item" aria-label="InDesign">
+        <div class="icon-glyph">
+          <div class="icon-mask" style="-webkit-mask-image:url('images/indesign-mask.png');mask-image:url('images/indesign-mask.png');"></div>
+        </div>
+        <span class="icon-label">InDesign</span>
+      </div>
+      <div class="icon-item" aria-label="Photoshop">
+        <div class="icon-glyph">
+          <div class="icon-mask" style="-webkit-mask-image:url('images/photoshop-mask.png');mask-image:url('images/photoshop-mask.png');"></div>
+        </div>
+        <span class="icon-label">Photoshop</span>
+      </div>
+      <div class="icon-item" aria-label="After Effects">
+        <div class="icon-glyph">
+          <div class="icon-mask" style="-webkit-mask-image:url('images/after-effects-mask.png');mask-image:url('images/after-effects-mask.png');"></div>
+        </div>
+        <span class="icon-label">After Effects</span>
+      </div>
+      <div class="icon-item" aria-label="Premiere">
+        <div class="icon-glyph">
+          <div class="icon-mask" style="-webkit-mask-image:url('images/premiere-mask.png');mask-image:url('images/premiere-mask.png');"></div>
+        </div>
+        <span class="icon-label">Premiere</span>
       </div>
       <div class="icon-item" aria-label="Figma">
         <div class="icon-glyph">
@@ -482,10 +514,10 @@
   <section class="block reveal" id="strengths">
     <h2>Core Strengths</h2>
     <div class="strengths">
-      <div class="strength-item">Brand consistency across multi-channel campaigns</div>
-      <div class="strength-item">Cross-functional collaboration with marketing teams</div>
-      <div class="strength-item">Strategic thinking rooted in marketing communications</div>
-      <div class="strength-item">Adaptability across print, digital and brand identity work</div>
+      <div class="strength-item">Brand consistency across <span class="mobile-break">multi-channel campaigns</span></div>
+      <div class="strength-item">Cross-functional collaboration with <span class="mobile-break">marketing teams</span></div>
+      <div class="strength-item">Strategic thinking rooted in <span class="mobile-break">marketing communications</span></div>
+      <div class="strength-item">Adaptability across print, digital and <span class="mobile-break">brand identity work</span></div>
       <div class="strength-item">Attention to detail under fast-paced deadlines</div>
       <div class="strength-item">Curiosity-driven, idea-first creative approach</div>
     </div>
