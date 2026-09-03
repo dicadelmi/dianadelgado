@@ -66,26 +66,22 @@
     margin-bottom:44px;
   }
 
-  /* ===== EXPERIENCE - MINIMAL TIMELINE ===== */
+  /* ===== EXPERIENCE - MINIMAL TIMELINE =====
+     Mobile-first: default styles below are the phone layout (a single
+     stacked column - dates, then title, then company, then bullets).
+     The grid/side-by-side timeline only switches on at min-width:641px.
+     This avoids relying on a max-width override to "undo" a desktop
+     grid, which is what was silently failing to collapse on-device. */
   .timeline{position:relative;}
-  .timeline::before{
-    content:'';position:absolute;left:162px;top:6px;bottom:6px;width:1px;background:var(--line);
-  }
   .role{
-    position:relative;
-    display:grid;
-    grid-template-columns:150px 24px 1fr;
-    column-gap:0;
-    align-items:start;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
   }
-  .role + .role{margin-top:52px;}
-  .timeline-final{margin-top:28px;}
+  .role + .role{margin-top:36px;}
+  .timeline-final{display:none;}
 
   .role-dates{
-    grid-column:1;
-    text-align:right;
-    padding-right:16px;
-    padding-top:3px;
     font-size:12px;
     font-weight:500;
     letter-spacing:.03em;
@@ -93,35 +89,58 @@
     white-space:nowrap;
     transition:color .2s linear;
   }
-  .role-dot-col{
-    grid-column:2;
-    display:flex;
-    justify-content:center;
-  }
-  .role-dot-col::before{
-    content:'';
-    width:7px;height:7px;border-radius:50%;
-    background:var(--grey);
-    margin-top:6px;
-    transition:background .2s linear, transform .2s ease;
-  }
-  .role.is-active .role-dot-col::before{
-    background:var(--black);
-    transform:scale(1.15);
-  }
-  .role-content{grid-column:3;padding-left:24px;}
+  .role-dot-col{display:none;}
 
-  .role-title{font-size:18px;font-weight:600;letter-spacing:-0.01em;}
-  .role-company{margin-top:3px;font-size:13.5px;color:var(--grey);}
+  .role-title{font-size:17px;font-weight:600;letter-spacing:-0.01em;}
+  .role-company{font-size:13.5px;color:var(--grey);}
 
-  .role ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:9px;}
+  .role ul{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:8px;}
   .role li{
     position:relative;padding-left:16px;
-    max-width:50%;
-    font-size:14.5px;line-height:1.62;color:#333;
+    font-size:14.5px;line-height:1.6;color:#333;
   }
   .role li::before{
     content:'';position:absolute;left:2px;top:7px;width:4px;height:4px;border-radius:50%;background:var(--grey);
+  }
+
+  /* ---- Desktop timeline: side-by-side grid with connecting line ---- */
+  @media(min-width:641px){
+    .timeline::before{
+      content:'';position:absolute;left:162px;top:6px;bottom:6px;width:1px;background:var(--line);
+    }
+    .role{
+      position:relative;
+      display:grid;
+      grid-template-columns:150px 24px 1fr;
+      column-gap:0;
+      row-gap:0;
+      align-items:start;
+    }
+    .role + .role{margin-top:52px;}
+    .timeline-final{display:grid;margin-top:28px;}
+
+    .role-dates{grid-column:1;text-align:right;padding-right:16px;padding-top:3px;}
+    .role-dot-col{
+      grid-column:2;display:flex;justify-content:center;
+    }
+    .role-dot-col::before{
+      content:'';width:7px;height:7px;border-radius:50%;background:var(--grey);
+      margin-top:6px;transition:background .2s linear, transform .2s ease;
+    }
+    .role.is-active .role-dot-col::before{background:var(--black);transform:scale(1.15);}
+    .role-content{grid-column:3;padding-left:24px;}
+
+    .role-title{font-size:18px;}
+    .role-company{margin-top:3px;}
+
+    .role ul{margin-top:16px;gap:9px;}
+    .role li{
+      max-width:62ch;
+      font-size:14.5px;line-height:1.62;
+    }
+  }
+  @media(min-width:641px) and (max-width:900px){
+    .role li{max-width:52ch;}
   }
 
   /* EDUCATION */
@@ -186,7 +205,7 @@
     padding-left:16px;position:relative;
   }
   .strength-item::before{
-    content:'';position:absolute;left:1px;top:8px;width:2px;height:2px;border-radius:50%;background:var(--grey);
+    content:'';position:absolute;left:1px;top:8px;width:1.5px;height:1.5px;border-radius:50%;background:var(--grey);
   }
 
   /* CONTACT CTA - matches the WORKS / BIO nav label styling */
@@ -204,12 +223,10 @@
   .social-row a:hover{opacity:1;}
   .social-row img{display:block;}
 
-  /* TABLET - keep the timeline intact, just ease the bullet column and
-     side padding before the layout fully stacks at the phone breakpoint */
+  /* TABLET - side padding only; the timeline itself now switches at 641px */
   @media(max-width:900px){
     .wrap{padding:0 24px;}
     .header-wrap{padding:0 24px;}
-    .role li{max-width:68%;}
   }
 
   @media(max-width:640px){
@@ -227,16 +244,18 @@
     }
     .page-head{padding:24px 0 48px;}
     section.block{padding:44px 0;}
-    .role + .role{margin-top:40px;}
-    .role{grid-template-columns:1fr;row-gap:6px;}
-    .timeline::before{display:none;}
-    .role-dates{text-align:left;padding-right:0;}
-    .role-dates .date-end{display:block;}
-    .role-dot-col{display:none;}
-    .role-content{padding-left:0;}
-    .role li{max-width:100%;}
     .strengths{grid-template-columns:1fr;}
-    .icon-row{gap:30px;}
+
+    /* icons: shrink so all five sit on one row on any phone width */
+    .icon-row{gap:10px;flex-wrap:nowrap;justify-content:space-between;margin-top:32px;}
+    .icon-glyph{width:24px;height:24px;}
+    .icon-label{font-size:10px;}
+
+    /* education: abbreviate handles most of it (in the markup); this
+       gives a little extra headroom on the smallest phones too */
+    .edu-degree{font-size:15px;}
+    .edu-item{gap:12px;}
+    .edu-item + .edu-item{margin-top:22px;padding-top:22px;}
   }
 </style>
 </head>
@@ -275,23 +294,23 @@
     <div class="timeline">
 
       <div class="role">
-        <div class="role-dates">2023<span class="date-end"> - Present</span></div>
+        <div class="role-dates">2023 - Present</div>
         <div class="role-dot-col"></div>
         <div class="role-content">
           <div class="role-title">Marketing Designer</div>
           <div class="role-company">Cunard, Carnival UK (P&amp;O Cruises &amp; Cunard)</div>
           <ul>
-            <li>Interpret stakeholder objectives, applying creative steer to shape clear, accessible visual outputs.</li>
-            <li>Design and execute guest-facing, multi-channel creative across CRM, Trade, Social, Web, Brand, F&amp;B and Campaigns.</li>
-            <li>Apply Cunard brand guidelines accurately, upholding tone, identity and design quality.</li>
-            <li>Adapt creative across digital and print, ensuring consistency across every touchpoint.</li>
+            <li>Interpret stakeholder objectives into clear, accessible visual outputs.</li>
+            <li>Design guest-facing, multi-channel creative across CRM, Trade, Social, Web, Brand, F&amp;B and Campaigns.</li>
+            <li>Apply Cunard brand guidelines accurately, upholding tone and identity.</li>
+            <li>Adapt creative across digital and print for consistent, on-brand results.</li>
             <li>Evolve work through feedback, refining typography, illustration and motion design.</li>
           </ul>
         </div>
       </div>
 
       <div class="role">
-        <div class="role-dates">Jun 2022<span class="date-end"> - Apr 2023</span></div>
+        <div class="role-dates">Jun 2022 - Apr 2023</div>
         <div class="role-dot-col"></div>
         <div class="role-content">
           <div class="role-title">Graphic Designer</div>
@@ -305,14 +324,14 @@
       </div>
 
       <div class="role">
-        <div class="role-dates">2015<span class="date-end"> - 2022</span></div>
+        <div class="role-dates">2015 - 2022</div>
         <div class="role-dot-col"></div>
         <div class="role-content">
           <div class="role-title">Graphic Designer</div>
           <div class="role-company">Newsquest Media Group</div>
           <ul>
             <li>Interpreted briefs for prompt, accurate delivery across print, digital and offline channels.</li>
-            <li>Led print and digital design production - brand identity, collateral and editorial/magazine design - across 165+ news brands and 40+ magazines.</li>
+            <li>Led print and digital design production across 165+ news brands and 40+ magazines.</li>
             <li>Managed end-to-end campaign production.</li>
             <li>Partnered with sales teams on proposals to support commercial advantage.</li>
           </ul>
@@ -320,7 +339,7 @@
       </div>
 
       <div class="role">
-        <div class="role-dates">2011<span class="date-end"> - 2015</span></div>
+        <div class="role-dates">2011 - 2015</div>
         <div class="role-dot-col"></div>
         <div class="role-content">
           <div class="role-title">Service Team Member Star</div>
@@ -333,20 +352,20 @@
       </div>
 
       <div class="role">
-        <div class="role-dates">2010<span class="date-end"> - 2011</span></div>
+        <div class="role-dates">2010 - 2011</div>
         <div class="role-dot-col"></div>
         <div class="role-content">
           <div class="role-title">Graphic Designer</div>
           <div class="role-company">Partners Brand</div>
           <ul>
             <li>Developed communication design skills in an advertising agency under tight deadlines.</li>
-            <li>Created communication strategies across print and corporate channels - annual reports, newsletters and campaigns - with internal communications teams.</li>
+            <li>Created communication strategies across print and corporate channels, including annual reports and campaigns.</li>
           </ul>
         </div>
       </div>
 
       <div class="role">
-        <div class="role-dates">2008<span class="date-end"> - 2010</span></div>
+        <div class="role-dates">2008 - 2010</div>
         <div class="role-dot-col"></div>
         <div class="role-content">
           <div class="role-title">Illustrator</div>
@@ -391,7 +410,7 @@
 
     <div class="edu-item">
       <div>
-        <div class="edu-degree">PGDip Corporate Communication</div>
+        <div class="edu-degree">PGDip Corporate Comm.</div>
         <div class="edu-inst">Universidad Autónoma de Occidente</div>
       </div>
       <div class="edu-dates">2010</div>
@@ -399,7 +418,7 @@
 
     <div class="edu-item">
       <div>
-        <div class="edu-degree">BA Graphic Communication Design</div>
+        <div class="edu-degree">BA Graphic Comm. Design</div>
         <div class="edu-inst">Universidad Autónoma de Occidente</div>
       </div>
       <div class="edu-dates">2005 - 2010</div>
@@ -473,7 +492,7 @@
   </section>
 
   <section class="cta reveal">
-    <a href="index.html">View My Works &gt;</a>
+    <a href="https://dianadelgado.uk">View My Works &gt;</a>
   </section>
 
 </div>
