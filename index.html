@@ -389,6 +389,12 @@
     // start the loop on the Garden Lounge card instead of the first card in the DOM
     const startCell = track.querySelector('.cell.h6c');
     let pos = startCell ? startCell.offsetLeft : 0;
+    // apply the starting offset immediately so the track is already showing
+    // the Garden Lounge card on the very first paint — without this, the
+    // strip briefly renders at translateX(0) (first cell in the DOM) and
+    // then visibly jumps to the Garden Lounge position once the first
+    // animation frame fires
+    track.style.transform = `translateX(${-pos}px)`;
     let last = null;
 
     // drag state
