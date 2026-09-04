@@ -480,9 +480,36 @@
       cell,
       video: cell.querySelector('video'),
       fade: cell.querySelector('.loop-fade'),
-      wasNearEnd: false
+      wasNearEnd: false,
+      fadeShown: false,
+      everSeen: false
     }));
     const vids = entries.map(e => e.video);
+    const entryByCell = new Map(entries.map(e => [e.cell, e]));
+
+    const FADE_SEC = 0.32;
+
+    function showFade(entry){
+      if(!entry.fade) return;
+      if(!entry.fadeShown){ entry.fade.classList.add('show'); entry.fadeShown = true; }
+    }
+    function hideFade(entry){
+      if(!entry.fade) return;
+      if(entry.fadeShown){ entry.fade.classList.remove('show'); entry.fadeShown = false; }
+    }
+
+    // Restart a video cleanly from time-zero, masked behind the poster
+    // crossfade so the seek never shows as a jump. The poster is that
+    // same first frame, so hiding the overlay right after the seek lands
+    // on a matching image, making the reset invisible.
+    function resetToStart(entry){
+      const {video} = entry;
+      showFade(entry);
+      try{ video.currentTime = 0; } catch(e){}
+      tryPlay(video);
+      entry.wasNearEnd = false;
+      setTimeout(() => hideFade(entry), FADE_SEC * 1000);
+    }
 
     function tryPlay(only){
       (only ? [only] : vids).forEach(v => {
@@ -542,16 +569,28 @@
     // drop the decoded frame when a video is paused and resumed in quick
     // succession. Resuming is still immediate, so there's no lag scrolling
     // a card back into view.
+    //
+    // Every time a card re-enters the viewport after having left it, its
+    // video is reset to time-zero (masked by the same crossfade used for a
+    // natural end-of-clip loop) so each pass through the gallery always
+    // shows that card from the beginning, rather than wherever it happened
+    // to be in its own internal loop.
     if('IntersectionObserver' in window){
       const pauseTimers = new WeakMap();
       const io = new IntersectionObserver(list => {
         list.forEach(en => {
-          const v = en.target.querySelector('video');
+          const entry = entryByCell.get(en.target);
+          const v = entry && entry.video;
           if(!v) return;
           const pending = pauseTimers.get(v);
           if(en.isIntersecting){
             if(pending){ clearTimeout(pending); pauseTimers.delete(v); }
-            tryPlay(v);
+            if(entry.everSeen){
+              resetToStart(entry);
+            } else {
+              tryPlay(v);
+            }
+            entry.everSeen = true;
           } else if(!pending){
             const t = setTimeout(() => {
               v.pause();
@@ -565,25 +604,26 @@
     }
 
     // Turn the hard reset at each native loop restart into a smooth
-    // dissolve: fade the poster frame in right as the clip approaches its
+    // dissolve too, in case a card dwells on screen long enough to reach
+    // its own natural end before the marquee has cycled it back out of
+    // view: fade the poster frame in right as the clip approaches its
     // end, then fade it back out once playback has visibly restarted —
     // since the poster is that same first frame, the crossfade always
     // lands on a matching image on both sides, so there's no visible jump.
     // Driven by rAF rather than the 'timeupdate' event: browsers only fire
     // timeupdate a few times a second, which can skip right over a short
     // fade window; polling every frame can't miss it.
-    const FADE_SEC = 0.32;
     const fadeEntries = entries.filter(e => e.fade);
     function fadeTick(){
       fadeEntries.forEach(entry => {
-        const {video, fade} = entry;
+        const {video} = entry;
         if(!isFinite(video.duration) || video.duration <= 0) return;
         const remaining = video.duration - video.currentTime;
         if(remaining <= FADE_SEC && remaining >= 0){
-          if(!entry.fadeShown){ fade.classList.add('show'); entry.fadeShown = true; }
+          showFade(entry);
           entry.wasNearEnd = true;
         } else if(entry.wasNearEnd && video.currentTime < FADE_SEC){
-          if(entry.fadeShown){ fade.classList.remove('show'); entry.fadeShown = false; }
+          hideFade(entry);
           entry.wasNearEnd = false;
         }
       });
