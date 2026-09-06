@@ -160,8 +160,12 @@
   .back-link:hover{color:var(--black);}
   .project-tag{margin-top:28px;font-size:13px;font-weight:300;letter-spacing:.06em;text-transform:uppercase;color:var(--grey);}
   .project-title{margin-top:10px;font-size:clamp(32px,5vw,54px);font-weight:600;letter-spacing:-0.02em;max-width:820px;}
-  .project-hero-img{margin-top:40px;width:100%;aspect-ratio:1966/1077;border-radius:2px;overflow:hidden;background:#EDEBE5;}
-  .project-hero-img img{width:100%;height:100%;object-fit:cover;display:block;}
+  .project-hero-img{margin-top:40px;width:100%;aspect-ratio:4/3;border-radius:2px;overflow:hidden;background:#EDEBE5;cursor:zoom-in;}
+  .project-hero-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease;transform-origin:50% 50%;}
+  .project-hero-img:hover img{transform:scale(2.2);}
+  @media(hover:none){
+    .project-hero-img:hover img{transform:none;}
+  }
 
   .overview-section{padding:56px 0 56px;text-align:center;}
   .overview-section h2{font-size:clamp(24px,3vw,32px);font-weight:600;letter-spacing:.02em;margin-bottom:14px;color:var(--black);}
@@ -351,6 +355,29 @@
     document.getElementById('lightbox').classList.remove('open');
   }
 
+  // Hero image: hover zoom (desktop) that magnifies toward the cursor so
+  // the paragraph text on the cover mockup can be read up close; on touch
+  // devices (no real hover) tapping opens the full lightbox instead.
+  (function () {
+    var heroWrap = document.querySelector('.project-hero-img');
+    if (!heroWrap) return;
+    var heroImg = heroWrap.querySelector('img');
+    if (!heroImg) return;
+
+    heroWrap.addEventListener('mousemove', function (e) {
+      var rect = heroWrap.getBoundingClientRect();
+      var x = ((e.clientX - rect.left) / rect.width) * 100;
+      var y = ((e.clientY - rect.top) / rect.height) * 100;
+      heroImg.style.transformOrigin = x + '% ' + y + '%';
+    });
+    heroWrap.addEventListener('mouseleave', function () {
+      heroImg.style.transformOrigin = '50% 50%';
+    });
+    heroWrap.addEventListener('click', function () {
+      openLightbox(heroImg);
+    });
+  })();
+
   // Prevent short "widow" final lines in the overview paragraphs: forces the
   // last line of each <p> in .overview-section to hold at least MIN_DESKTOP
   // words above 767px wide, or MIN_MOBILE words at or below it, by gluing
@@ -398,6 +425,18 @@
       []
     ];
 
+    // Mobile-only joins: applied only at/below MOBILE_MAX_WIDTH. Used here to
+    // pull "guests" up onto the line above on mobile, per explicit request,
+    // even though that can leave the final line under MIN_MOBILE words.
+    var MOBILE_ONLY_MANUAL_JOINS = {
+      1: [['energise', 'guests']]
+    };
+
+    // Paragraphs listed here skip the dynamic min-word top-up on mobile
+    // once their manual joins are applied, so the forced break above is
+    // allowed to stand even if it leaves a short final line.
+    var SKIP_DYNAMIC_MOBILE = { 1: true };
+
     function seedManualJoins(words, pairs) {
       var joinBefore = new Set();
       pairs.forEach(function (pair) {
@@ -416,8 +455,17 @@
         p.dataset.origWords = p.textContent.trim().split(/\s+/).join('\u0001');
       }
       var words = p.dataset.origWords.split('\u0001');
-      var min = window.innerWidth <= MOBILE_MAX_WIDTH ? MIN_MOBILE : MIN_DESKTOP;
-      var joinBefore = seedManualJoins(words, MANUAL_JOINS[paragraphIndex] || []);
+      var isMobile = window.innerWidth <= MOBILE_MAX_WIDTH;
+      var min = isMobile ? MIN_MOBILE : MIN_DESKTOP;
+      var pairs = (MANUAL_JOINS[paragraphIndex] || []).slice();
+      if (isMobile && MOBILE_ONLY_MANUAL_JOINS[paragraphIndex]) {
+        pairs = pairs.concat(MOBILE_ONLY_MANUAL_JOINS[paragraphIndex]);
+      }
+      var joinBefore = seedManualJoins(words, pairs);
+      if (isMobile && SKIP_DYNAMIC_MOBILE[paragraphIndex]) {
+        render(p, words, joinBefore);
+        return;
+      }
       var guard = 0;
       while (guard < words.length) {
         render(p, words, joinBefore);
