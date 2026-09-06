@@ -160,7 +160,7 @@
   .back-link:hover{color:var(--black);}
   .project-tag{margin-top:28px;font-size:13px;font-weight:300;letter-spacing:.06em;text-transform:uppercase;color:var(--grey);}
   .project-title{margin-top:10px;font-size:clamp(32px,5vw,54px);font-weight:600;letter-spacing:-0.02em;max-width:820px;}
-  .project-hero-img{margin-top:40px;width:100%;aspect-ratio:4/3;border-radius:2px;overflow:hidden;background:#EDEBE5;}
+  .project-hero-img{margin-top:40px;width:100%;aspect-ratio:1966/1077;border-radius:2px;overflow:hidden;background:#EDEBE5;}
   .project-hero-img img{width:100%;height:100%;object-fit:cover;display:block;}
 
   .overview-section{padding:56px 0 56px;text-align:center;}
@@ -171,7 +171,8 @@
   .media-cell{aspect-ratio:1/1;border-radius:2px;overflow:hidden;background:#F4F3F0;}
   .media-cell img,.media-cell video{width:100%;height:100%;object-fit:cover;display:block;}
 
-  .project-full-image{padding:28px 0 80px;}
+  .project-full-image{padding:0;}
+  .project-full-image:last-of-type{padding-bottom:56px;}
   .project-full-image img{width:100%;display:block;border-radius:2px;cursor:zoom-in;}
 
   .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:100;padding:32px;cursor:zoom-out;}
@@ -189,7 +190,8 @@
     .overview-section h2{margin-bottom:12px;font-size:clamp(18px,3vw,22px);}
     .overview-section p{font-size:clamp(10.5px,calc((100vw - 40px) / 22.5),16px);}
     .project-title{white-space:nowrap;font-size:clamp(18px,calc((100vw - 40px) / 12.4),40px);}
-    .project-full-image{padding:24px 0 60px;}
+    .project-full-image{padding:0;}
+    .project-full-image:last-of-type{padding-bottom:40px;}
     .project-nav{flex-direction:column;align-items:flex-start;gap:14px;}
     .project-nav .next{text-align:left;}
   }
@@ -253,7 +255,7 @@
 <section class="overview-section">
   <div class="wrap">
     <h2>Night Cocktails</h2>
-    <p>The Night Cocktails menu shifts into a nocturnal palette. Deep indigo tones frame the illustrated Queen of the Night flower - symbolising elegance and mystery - surrounded by gin botanicals such as juniper, garlic flower, and vine leaves. This design mirrors the lounge&rsquo;s transition from sunset to starlight, enhancing its evening ambience beneath the glass roof.</p>
+    <p>The Night Cocktails menu shifts into a nocturnal palette. Deep indigo tones frame the illustrated Queen of the Night flower - symbolising elegance and mystery - surrounded by gin botanicals and vine leaves. This design mirrors the lounge&rsquo;s transition from sunset to starlight, enhancing its evening ambience beneath the glass roof.</p>
   </div>
 </section>
 
@@ -348,6 +350,106 @@
   function closeLightbox(){
     document.getElementById('lightbox').classList.remove('open');
   }
+
+  // Prevent short "widow" final lines in the overview paragraphs: forces the
+  // last line of each <p> in .overview-section to hold at least MIN_DESKTOP
+  // words above 767px wide, or MIN_MOBILE words at or below it, by gluing
+  // words together with non-breaking spaces (working outward from the wrap
+  // point) so a group is pushed to the next line together rather than one
+  // short word alone.
+  (function () {
+    var MIN_DESKTOP = 6;
+    var MIN_MOBILE = 4;
+    var MOBILE_MAX_WIDTH = 767;
+
+    function getLines(p) {
+      var spans = p.querySelectorAll('span.no-widow-word');
+      var lines = [];
+      var lastTop = null;
+      spans.forEach(function (s) {
+        var top = Math.round(s.getBoundingClientRect().top);
+        if (lastTop === null || Math.abs(top - lastTop) > 3) {
+          lines.push([s]);
+          lastTop = top;
+        } else {
+          lines[lines.length - 1].push(s);
+        }
+      });
+      return lines;
+    }
+
+    function render(p, words, joinBefore) {
+      var html = '';
+      words.forEach(function (w, i) {
+        if (i > 0) html += joinBefore.has(i) ? '&nbsp;' : ' ';
+        html += '<span class="no-widow-word">' + w + '</span>';
+      });
+      p.innerHTML = html;
+    }
+
+    // Manual fixes for specific short words the client flagged as awkward
+    // line-end "widows" (e.g. a lone "the"/"a", or a heading word like
+    // "These" stranded alone). Keyed by paragraph order on the page
+    // (0 = Project Overview, 1 = Morning Blends, 2 = Night Cocktails) and
+    // by the exact word pair to glue together with a non-breaking join.
+    var MANUAL_JOINS = [
+      [['the', 'morning']],
+      [['citrus', 'illustrations'], ['These', 'elements'], ['a', 'wellness-focused']],
+      []
+    ];
+
+    function seedManualJoins(words, pairs) {
+      var joinBefore = new Set();
+      pairs.forEach(function (pair) {
+        for (var i = 1; i < words.length; i++) {
+          if (words[i - 1] === pair[0] && words[i] === pair[1]) {
+            joinBefore.add(i);
+            break;
+          }
+        }
+      });
+      return joinBefore;
+    }
+
+    function enforce(p, paragraphIndex) {
+      if (!p.dataset.origWords) {
+        p.dataset.origWords = p.textContent.trim().split(/\s+/).join('\u0001');
+      }
+      var words = p.dataset.origWords.split('\u0001');
+      var min = window.innerWidth <= MOBILE_MAX_WIDTH ? MIN_MOBILE : MIN_DESKTOP;
+      var joinBefore = seedManualJoins(words, MANUAL_JOINS[paragraphIndex] || []);
+      var guard = 0;
+      while (guard < words.length) {
+        render(p, words, joinBefore);
+        var lines = getLines(p);
+        if (lines.length < 2) break;
+        var lastLineCount = lines[lines.length - 1].length;
+        if (lastLineCount >= min) break;
+        var firstIdxOfLastLine = words.length - lastLineCount;
+        if (joinBefore.has(firstIdxOfLastLine)) break; // already forced, avoid infinite loop
+        joinBefore.add(firstIdxOfLastLine);
+        guard++;
+      }
+    }
+
+    function enforceAll() {
+      document.querySelectorAll('.overview-section p').forEach(function (p, i) {
+        enforce(p, i);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', enforceAll);
+    } else {
+      enforceAll();
+    }
+    window.addEventListener('load', enforceAll);
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(enforceAll, 150);
+    });
+  })();
 </script>
 </body>
 </html>
