@@ -425,17 +425,10 @@
       []
     ];
 
-    // Mobile-only joins: applied only at/below MOBILE_MAX_WIDTH. Used here to
-    // pull "guests" up onto the line above on mobile, per explicit request,
-    // even though that can leave the final line under MIN_MOBILE words.
+    // Mobile-only joins: applied only at/below MOBILE_MAX_WIDTH.
     var MOBILE_ONLY_MANUAL_JOINS = {
-      1: [['energise', 'guests']]
+      1: [['selection', 'designed']]
     };
-
-    // Paragraphs listed here skip the dynamic min-word top-up on mobile
-    // once their manual joins are applied, so the forced break above is
-    // allowed to stand even if it leaves a short final line.
-    var SKIP_DYNAMIC_MOBILE = { 1: true };
 
     function seedManualJoins(words, pairs) {
       var joinBefore = new Set();
@@ -462,10 +455,6 @@
         pairs = pairs.concat(MOBILE_ONLY_MANUAL_JOINS[paragraphIndex]);
       }
       var joinBefore = seedManualJoins(words, pairs);
-      if (isMobile && SKIP_DYNAMIC_MOBILE[paragraphIndex]) {
-        render(p, words, joinBefore);
-        return;
-      }
       var guard = 0;
       while (guard < words.length) {
         render(p, words, joinBefore);
