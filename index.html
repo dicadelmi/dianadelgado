@@ -57,7 +57,8 @@
 
   /* HERO GALLERY — continuous rotating slide strip */
   .gallery-band{overflow:hidden;max-width:1260px;margin:0 auto;padding:0 40px;touch-action:pan-y;}
-  .gallery-track{display:flex;gap:16px;width:max-content;will-change:transform;transform:translate3d(0,0,0);backface-visibility:hidden;}
+  .gallery-track{display:flex;gap:16px;width:max-content;will-change:transform;transform:translate3d(0,0,0);backface-visibility:hidden;opacity:0;}
+  .gallery-track.is-ready{opacity:1;transition:opacity .25s ease;}
   .cell{
     width:min(32vw,380px);aspect-ratio:0.86;flex-shrink:0;
     background-size:cover;background-position:center;overflow:hidden;position:relative;
@@ -395,6 +396,15 @@
     // then visibly jumps to the Garden Lounge position once the first
     // animation frame fires
     track.style.transform = `translateX(${-pos}px)`;
+    // the track itself starts hidden (opacity:0, see CSS) precisely because
+    // setting the transform above isn't enough on its own: the browser can
+    // paint the very first frame — showing whatever cell happens to be first
+    // in the DOM (IMECE) at translateX(0) — before this script even runs,
+    // since the inline base64 images decode and paint during HTML parsing.
+    // Revealing the track only now, after its correct starting position is
+    // already in place, guarantees the first thing the user ever sees is the
+    // Garden Lounge card, not a flash of the wrong one.
+    track.classList.add('is-ready');
     let last = null;
 
     // drag state
