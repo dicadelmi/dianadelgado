@@ -126,39 +126,35 @@
   .cats span:hover, .cats span.active{color:var(--black);}
 
   /* WORK GRID — 2 columns x 6 rows, category-reactive.
-     Each category owns its own .work-set (a distinct grid of cards). All
-     sets share the same grid cell (grid-column/row:1) so the outgoing and
-     incoming set overlap and crossfade directly into one another — rather
-     than the outgoing set fading fully to the page background before the
-     incoming one starts appearing, which is what was showing as a flash
-     of white partway through the swap. */
+     Each category owns its own .work-set (a distinct grid of cards), all
+     stacked in the same grid cell. Cross-fading two different photo sets
+     directly into each other double-exposed into a hazy smear, and a
+     dip-to-black veil over the swap just read as its own solid block.
+     Instead the outgoing set is cut out instantly (no time-overlap with
+     the incoming one, so no blend of two unrelated photos) and the
+     incoming set fades in on its own over its own card backgrounds —
+     nothing solid ever covers the grid. */
   .work-grid{
     display:grid;padding:40px 0 80px;
   }
   .work-set{
-    grid-column:1;grid-row:1;z-index:1;
+    grid-column:1;grid-row:1;
     display:none;
     grid-template-columns:1fr 1fr;gap:0;
-    opacity:0;transition:opacity .3s ease;
+    opacity:0;transition:opacity .25s ease;
     pointer-events:none;
   }
   .work-set.is-active{display:grid;}
   .work-set.is-active.is-visible{opacity:1;pointer-events:auto;}
-  /* the outgoing set is kept on top (above the incoming one) for the
-     duration of the crossfade, so its fade-out visibly dissolves into
-     the incoming set underneath rather than the two just swapping */
-  .work-set.is-leaving{z-index:2;}
   .work-grid a{
     display:block;position:relative;overflow:hidden;aspect-ratio:4/3;
-    background:#EDEBE5;transition:filter .35s ease,opacity .35s ease;
-    transform:translateZ(0);backface-visibility:hidden;
+    background:#EDEBE5;transition:opacity .3s ease;
   }
   .work-grid a .swatch{
     position:absolute;inset:0;transition:opacity .4s ease;
   }
   .work-grid a .thumb{
     position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
-    transform:translateZ(0);backface-visibility:hidden;
   }
   .work-grid a .cap{
     position:absolute;left:12px;bottom:10px;z-index:2;color:#fff;
@@ -166,7 +162,7 @@
     opacity:0;transition:opacity .3s ease;
   }
   .work-grid a:hover .cap{opacity:1;}
-  .work-grid a::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.16);z-index:1;transition:background .35s ease;}
+  .work-grid a::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.16);z-index:1;transition:background .3s ease;}
   .work-grid a:hover::after{background:rgba(0,0,0,0.5);}
   .work-grid a.touch-hover .cap{opacity:1;}
   .work-grid a.touch-hover::after{background:rgba(0,0,0,0.5);}
@@ -702,13 +698,30 @@
   // hovering (or tapping) a category switches the visible card set —
   // and it just stays once shown, so moving the pointer down off the
   // label and into the cards to actually click one never snaps back to
-  // the previous set. Only one set is ever in the layout at a time;
-  // switching crossfades the old one out and the new one in.
+  // the previous set. Only one set is ever in the layout at a time.
+  // the category card sets are inline data-URI images, so there's no
+  // network wait, but a large embedded photo can still take a moment to
+  // decode the first time it's actually painted. Any set other than the
+  // one shown on load stays display:none until it's switched to, which
+  // defers that decode to the exact moment of the hover/tap — showing a
+  // blank placeholder block for a beat mid-crossfade. Decoding every
+  // thumbnail up front (while idle, off the critical path) means that
+  // cost is already paid by the time anyone switches sets.
+  const preloadThumbs = () => {
+    document.querySelectorAll('.work-grid .thumb').forEach(img => {
+      if (img.decode) img.decode().catch(() => {});
+    });
+  };
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(preloadThumbs);
+  } else {
+    setTimeout(preloadThumbs, 300);
+  }
+
   const catRow = document.getElementById('catRow');
   const workGrid = document.getElementById('workGrid');
   const gridCells = workGrid.querySelectorAll('a');
   const DEFAULT_SET = 'print';
-  const SET_FADE_MS = 300; // keep in sync with the .work-set opacity transition
   let currentSet = DEFAULT_SET;
 
   function showSet(setName){
@@ -716,21 +729,14 @@
     if(!nextEl || setName === currentSet) return;
     const activeEl = workGrid.querySelector('.work-set.is-active');
     if(activeEl && activeEl !== nextEl){
-      // both sets share the same grid cell, so bringing the new one in at
-      // the same moment the old one starts fading out makes them actually
-      // cross-fade into each other instead of one going fully transparent
-      // (exposing the white page background) before the next appears.
-      // Keeping the outgoing set on top while it fades means its dissolve
-      // is what's visible, revealing the incoming set underneath, rather
-      // than the incoming set instantly covering it at full opacity.
-      activeEl.classList.add('is-leaving');
+      // cut the outgoing set out immediately — no time-overlap with the
+      // incoming one, so two unrelated photos never blend into a hazy
+      // smear — then just let the incoming set fade in on its own over
+      // its own card backgrounds; nothing solid ever covers the grid
+      activeEl.classList.remove('is-active', 'is-visible');
       nextEl.classList.add('is-active');
       void nextEl.offsetWidth; // force reflow so the fade-in actually transitions
-      activeEl.classList.remove('is-visible');
       nextEl.classList.add('is-visible');
-      setTimeout(() => {
-        activeEl.classList.remove('is-active', 'is-leaving');
-      }, SET_FADE_MS);
     } else {
       nextEl.classList.add('is-active');
       void nextEl.offsetWidth;
