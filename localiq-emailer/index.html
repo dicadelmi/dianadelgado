@@ -36,6 +36,15 @@
     height:auto;
   }
 
+  .full-video{
+    display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:16/9;
+    object-fit:cover;
+    object-position:center;
+  }
+
   .row-pair{
     display:flex;
     width:100%;
@@ -143,7 +152,7 @@
 
 <main>
 <div class="wrap">
-  <video class="full-img" src="images/img-04.mp4" autoplay loop muted playsinline controls></video>
+  <video class="full-video" src="images/img-04.mp4" autoplay loop muted playsinline></video>
   <img class="full-img" src="images/img-05.jpg" alt="LOCALiQ Emailer">
 </div>
 </main>
