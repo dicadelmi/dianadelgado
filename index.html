@@ -11,6 +11,7 @@
     --black:#0A0A0A;
     --white:#FFFFFF;
     --grey:#8A8A8A;
+    --grey-dark:#4A4A4A;
     --line:#ECECEC;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -122,8 +123,33 @@
     display:flex;justify-content:center;flex-wrap:wrap;
     gap:10px 32px;padding:20px 0;
   }
-  .cats span{font-size:14px;font-weight:400;letter-spacing:.04em;color:var(--grey);white-space:nowrap;cursor:pointer;transition:color .25s ease;}
-  .cats span:hover, .cats span.active{color:var(--black);}
+  /* Each category is a real button: invisible border, transparent bg,
+     enough padding to grow the tap target without changing the visual
+     rhythm of the row. A chevron sits after the label at low opacity so
+     the row reads as "a set of controls" even before anyone hovers. */
+  .cats button{
+    font:inherit;font-size:14px;font-weight:400;letter-spacing:.04em;color:var(--grey);
+    white-space:nowrap;cursor:pointer;transition:color .25s ease,font-weight .25s ease;
+    background:none;border:none;padding:8px 2px;margin:-8px -2px;position:relative;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .cats button::after{
+    /* underline that draws in on hover — width animates from 0, so at
+       rest it's invisible and adds no clutter */
+    content:'';position:absolute;left:2px;right:2px;bottom:4px;height:.5px;
+    background:var(--grey-dark);opacity:.55;transform:scaleX(0);transform-origin:left;
+    transition:transform .25s ease;
+  }
+  .cats .chev{
+    width:7px;height:7px;flex-shrink:0;opacity:.35;transition:opacity .25s ease,transform .25s ease;
+    border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
+    transform:rotate(45deg) translateY(-1px);
+  }
+  .cats button:hover, .cats button.active{color:var(--grey-dark);font-weight:500;}
+  .cats button:hover .chev, .cats button.active .chev{opacity:.8;}
+  .cats button:hover::after{transform:scaleX(1);}
+  .cats button.active::after{transform:scaleX(1);}
+  .cats button:focus-visible{outline:1px solid var(--black);outline-offset:6px;border-radius:2px;}
 
   /* WORK GRID — 2 columns x 6 rows, category-reactive.
      Each category owns its own .work-set (a distinct grid of cards), all
@@ -304,10 +330,10 @@
 
 <div class="wrap">
   <div class="cats" id="catRow">
-    <span data-cat="print">Print &amp; Editorial</span>
-    <span data-cat="marketing">Marketing Campaigns</span>
-    <span data-cat="brand">Brand Identity</span>
-    <span data-cat="digital">Digital Design</span>
+    <button type="button" data-cat="print">Print &amp; Editorial<span class="chev" aria-hidden="true"></span></button>
+    <button type="button" data-cat="marketing">Marketing Campaigns<span class="chev" aria-hidden="true"></span></button>
+    <button type="button" data-cat="brand">Brand Identity<span class="chev" aria-hidden="true"></span></button>
+    <button type="button" data-cat="digital">Digital Design<span class="chev" aria-hidden="true"></span></button>
   </div>
 </div>
 
@@ -759,7 +785,7 @@
   }
 
   function setActiveTag(cat){
-    catRow.querySelectorAll('span').forEach(t => {
+    catRow.querySelectorAll('button').forEach(t => {
       t.classList.toggle('active', t.dataset.cat === cat);
     });
   }
@@ -770,9 +796,10 @@
     showSet(cat);
   }
 
-  catRow.querySelectorAll('span').forEach(tag => {
+  catRow.querySelectorAll('button').forEach(tag => {
     tag.addEventListener('mouseenter', () => selectCategory(tag.dataset.cat));
     tag.addEventListener('click', () => selectCategory(tag.dataset.cat));
+    tag.addEventListener('focus', () => selectCategory(tag.dataset.cat));
   });
 
   const isTouchDevice = window.matchMedia('(hover: none)').matches || 'ontouchstart' in window;
